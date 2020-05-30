@@ -26,7 +26,31 @@ class Cossim(Kernel):
 
     def dim(self):
         return self._dim
+    
 
+class rbf_kernel(Kernel):
+    """
+    Exponential kernel, 
+
+        K(x, y) = e^(-||x - y||/(2*s^2))
+
+    where:
+        s = sigma
+    """
+
+    def __init__(self, sigma=2.0):
+        self.sigma = sigma
+
+    def _compute(self, X1, X2):
+        X2_norm = np.sum(X2 ** 2, axis=-1)
+        X1_norm = np.sum(X1 ** 2, axis=-1)
+        gamma = 1 / (2 * self.sigma ** 2)
+        K = np.exp(- gamma * (X1_norm[:, None] + X2_norm[None, :] - 2 * np.dot(X1, X2.T)))
+        return K
+
+    def dim(self):
+        return np.inf
+    
 class Exponential(Kernel):
     """
     Exponential kernel, 
